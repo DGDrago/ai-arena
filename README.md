@@ -1,19 +1,22 @@
 # AI Arena — Debate Engine
 
-Watch **Claude Code** debate a local LLM (Ollama / LM Studio / llama.cpp / Jan / text-gen-webui) on any topic, live in the browser.
+Watch **Claude** debate a local LLM (Ollama / LM Studio / llama.cpp / Jan / text-gen-webui) on any topic, live in the browser.
+
+![AI Arena screenshot](ai-arena-readme.jpg)
 
 ```
 Claude Code CLI  ─┐
-                   ├──  debate_channel.json  ──  watcher.py  ──  local LLM
-Auto mode      ──┘                                   │
+Claude API      ──┼──  debate_channel.json  ──  watcher.py  ──  local LLM
+Auto mode       ──┘                                  │
                                                   server.py
                                                      │
                                                  browser UI (SSE)
 ```
 
-Two modes:
-- **Real Claude Code CLI** — you run `claude` in one terminal; it reads `CLAUDE.md`, gets the full briefing automatically, and participates as the Claude side
-- **Auto (local model)** — `claude_auto.py` plays Claude's role using the same local server with an adversarial persona; fully autonomous, no CLI needed
+Three modes for Claude's side:
+- **Real Claude Code CLI** — run `claude` in a terminal; it reads `CLAUDE.md`, gets the full briefing, and debates manually
+- **Claude API** — `claude_watcher.py` calls the Anthropic API automatically; set `ANTHROPIC_API_KEY` in `.env`, fully autonomous
+- **Auto (local model)** — `claude_auto.py` plays Claude's role using the same local server with an adversarial persona; no API key needed
 
 ---
 
@@ -23,6 +26,7 @@ Two modes:
 - Python 3.10+
 - [Ollama](https://ollama.com) **or** [LM Studio](https://lmstudio.ai) running with a model loaded
 - [Claude Code CLI](https://docs.anthropic.com/claude-code) — only for Real Claude mode
+- `ANTHROPIC_API_KEY` — only for Claude API mode
 
 ### Install
 ```bash
@@ -43,10 +47,10 @@ Browser opens at **http://localhost:5000** automatically.
 
 1. **Browser** — configure server, model, topics, push-back count, Claude side
 2. Click **Start Debate**
-3. If using **Real Claude Code CLI** mode:
-   - Open a second terminal: `cd ai-arena && claude`
-   - Claude reads `CLAUDE.md` automatically — full briefing is there
-   - Tell it: `debate started` — it reads `_claude_context.md` and begins
+3. Depending on **Claude side** mode:
+   - **Real Claude Code CLI**: open a second terminal: `cd ai-arena && claude`, then say `debate started`
+   - **Claude API**: set `ANTHROPIC_API_KEY=sk-...` in `.env` — starts automatically
+   - **Auto**: fully autonomous, no extra steps
 4. Watch the debate in the browser, save transcript when done
 
 ---
@@ -72,6 +76,7 @@ ai-arena/
 ├── server.py              # Flask backend — coordinates the debate
 ├── index.html             # Web UI (single-page app, SSE stream)
 ├── watcher.py             # Polls channel, calls local LLM for opponent responses
+├── claude_watcher.py      # Claude API mode: drives Claude's side via Anthropic API
 ├── claude_auto.py         # Auto mode: drives Claude's side with local model
 ├── start.py               # Launcher: starts server + opens browser
 ├── CLAUDE.md              # Auto-loaded by Claude Code — full debater briefing
@@ -97,10 +102,11 @@ ai-arena/
 
 - **`watcher.py`** polls the file every 0.4s; when it sees a new Claude message it calls the local model and appends the response
 - **`server.py`** SSE endpoint streams new entries to the browser as they appear
+- **`claude_watcher.py`** (API mode) calls the Anthropic API; requires `ANTHROPIC_API_KEY` in `.env`
 - **`claude_auto.py`** (auto mode) calls the same local model with a Claude adversarial system prompt
 
 ---
 
 ## License
 
-GNU
+GNU General Public License v3.0 — see [LICENSE](LICENSE)

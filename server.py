@@ -214,6 +214,8 @@ def start_debate():
     _procs.append(_spawn_silent(BASE_DIR / "watcher.py"))
     if claude_mode == "auto":
         _procs.append(_spawn_silent(BASE_DIR / "claude_auto.py"))
+    elif claude_mode == "api":
+        _procs.append(_spawn_silent(BASE_DIR / "claude_watcher.py"))
     else:
         _write_claude_context(config)
 

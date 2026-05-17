@@ -721,6 +721,12 @@
             Auto (local model)
             <span class="radio-badge">claude_auto.py</span>
           </label>
+          <label class="radio-label" id="label-mode-api" onclick="onClaudeModeChange('api')">
+            <input type="radio" name="claude-mode" value="api">
+            <span style="width:7px;height:7px;border-radius:50%;background:var(--claude);flex-shrink:0;display:inline-block;"></span>
+            Claude API
+            <span class="radio-badge">ANTHROPIC_API_KEY</span>
+          </label>
         </div>
         <div id="claude-mode-hint" style="font-size:11px;color:var(--text-dim);margin-top:6px;">
           Start Claude Code CLI in the <code style="font-size:10px;color:var(--claude);">ai-arena/</code> dir — it reads CLAUDE.md automatically.
@@ -828,11 +834,13 @@ function onClaudeModeChange(mode) {
   const hints = {
     manual: 'Start Claude Code CLI in the <code style="font-size:10px;color:var(--claude);">ai-arena/</code> dir — it reads CLAUDE.md automatically.',
     auto:   'claude_auto.py will play Claude\'s role using the same local model with an adversarial persona.',
+    api:    'claude_watcher.py calls the real Claude API. Set <code style="font-size:10px;color:var(--claude);">ANTHROPIC_API_KEY</code> in <code style="font-size:10px;">.env</code> — fully autonomous.',
   };
   $('claude-mode-hint').innerHTML = hints[mode] || '';
   const notes = {
     manual: 'Run <code style="font-size:10px;">claude</code> in the <code style="font-size:10px;">ai-arena/</code> folder',
     auto:   'Fully autonomous — no Claude Code CLI needed',
+    api:    'Fully autonomous — real Claude API, no CLI needed',
   };
   if ($('bottom-note')) $('bottom-note').innerHTML = notes[mode] || '';
   // set radio checked state
