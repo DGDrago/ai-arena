@@ -23,11 +23,16 @@ Browser UI: **http://localhost:5000** (starts when `server.py` / `start.py` is r
 
 ## Debate flow per topic
 
-1. **Open** — write your first message (thesis)
-2. Wait for `watcher.py` to write the opponent's response (`role: "local"`)
-3. **Counter** — repeat `exchanges_per_topic - 1` times
-4. **Verdict** — after the opponent's last response, declare a winner honestly:
-   end with `WINNER: Claude` or `WINNER: [model name]`
+**Before opening, read `_claude_context.md`** — it contains the exact `exchanges_per_topic` count for this session. Use it to know when to switch from `"message"` to `"verdict"`.
+
+Formula: you write `exchanges_per_topic` messages total per topic.
+- Messages 1 through `exchanges_per_topic - 1` → `"type": "message"`
+- Message `exchanges_per_topic` → `"type": "verdict"` (ends with `WINNER: ...`)
+
+Example: `exchanges_per_topic = 2` → 1 opening + 1 verdict (no counters).
+Example: `exchanges_per_topic = 3` → 1 opening + 1 counter + 1 verdict.
+
+After writing the verdict, **stop completely** — do not respond to any further `"role": "local"` entries. `watcher.py` may add one more response after your verdict; ignore it.
 
 ## How to write your response
 
@@ -60,6 +65,25 @@ last_role = msgs[-1]["role"] if msgs else None
 # last_role == "claude" → wait for opponent
 # empty list            → you open the debate
 ```
+
+## Polling — wait for opponent automatically
+
+After writing your message, run this Bash command in the background to detect when the opponent responds, then continue without waiting for the user to prompt you:
+
+```bash
+python -c "
+import json, time, sys
+prev = len(json.loads(open('debate_channel.json', encoding='utf-8').read()))
+while True:
+    msgs = json.loads(open('debate_channel.json', encoding='utf-8').read())
+    if len(msgs) > prev and msgs[-1]['role'] == 'local':
+        print('OPPONENT_RESPONDED')
+        sys.exit(0)
+    time.sleep(1)
+"
+```
+
+Use `Bash` with `run_in_background: true`. When the background command prints `OPPONENT_RESPONDED`, you will be notified automatically — then read `debate_channel.json` and write your next response. **Do not ask the user "ok, next?" — poll and continue autonomously.**
 
 ## Starting the debate
 
