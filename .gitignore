@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+*.pyo
+
+# Runtime generated files
+debate_channel.json
+debate_config.json
+_claude_context.md
+transcript.md
+*.md.bak
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
