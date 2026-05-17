@@ -103,4 +103,4 @@ ai-arena/
 
 ## License
 
-MIT
+GNU
